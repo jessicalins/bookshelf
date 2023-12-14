@@ -21,9 +21,13 @@ class Reader
     #[ORM\OneToMany(mappedBy: 'reviewer', targetEntity: Review::class)]
     private Collection $reviews;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bookshelf::class, orphanRemoval: true)]
+    private Collection $bookshelves;
+
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
+        $this->bookshelves = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -71,5 +75,39 @@ class Reader
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Bookshelf>
+     */
+    public function getBookshelves(): Collection
+    {
+        return $this->bookshelves;
+    }
+
+    public function addBookshelf(Bookshelf $bookshelf): static
+    {
+        if (!$this->bookshelves->contains($bookshelf)) {
+            $this->bookshelves->add($bookshelf);
+            $bookshelf->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookshelf(Bookshelf $bookshelf): static
+    {
+        if ($this->bookshelves->removeElement($bookshelf)) {
+            // set the owning side to null (unless already changed)
+            if ($bookshelf->getOwner() === $this) {
+                $bookshelf->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+    public function __toString(): string
+    {
+        return $this->name;
     }
 }

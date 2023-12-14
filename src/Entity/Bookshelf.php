@@ -22,6 +22,13 @@ class Bookshelf
     #[ORM\OneToMany(mappedBy: 'bookshelf', targetEntity: Volume::class)]
     private Collection $volumes;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\ManyToOne(inversedBy: 'bookshelves')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Reader $owner = null;
+
     public function __construct()
     {
         $this->type = BookshelfType::ToRead;
@@ -71,6 +78,35 @@ class Bookshelf
                 $volume->setBookshelf(null);
             }
         }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getOwner(): ?Reader
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?Reader $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }
